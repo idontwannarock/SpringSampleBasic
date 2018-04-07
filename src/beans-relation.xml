@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 
+		抽象bean: bean的abstract屬性為true，這樣的bean不能被IOC容器實例化，只用來被繼承配置
+		若某一個bean的class屬性沒有指定，則該bean必須是一個抽象bean
+	 -->
+	<bean id="address" p:city="Taipei-" p:street="GuanHuiRoad" abstract="true"/>
+	
+	<!-- bean配置的繼承: 使用bean的parent屬性指定繼承哪個bean的配置 -->
+	<bean id="address2" class="com.wch.spring.beans.autowire.Address" parent="address"/>
+		
+	<bean id="address3" class="com.wch.spring.beans.autowire.Address" parent="address2" p:street="RoosveltRoad"/>
+	
+	<bean id="car" class="com.wch.spring.beans.autowire.Car" p:brand="Audi" p:price="1500000"/>
+	
+	<!-- 要求在配置person時，必須有一個關聯的car，換句話說person這個bean依賴於car這個bean -->
+	<bean id="person" class="com.wch.spring.beans.autowire.Person" p:name="Tom" p:address-ref="address2" depends-on="car"/>
+
+</beans>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+	<!-- 
+		配置 bean
+		class: bean的完整類別，透過反射的方式在IOC容器中創建Bean，所以要求Bean中必須有無參數的建構子
+		id: 標示容器中的bean，id在容器中必須唯一
+	-->
+	<bean id="helloWorld" class="com.wch.spring.beans.HelloWorld">
+		<property name="name" value="Spring"/>
+	</bean>
+
+	<!-- 通過建構子方式來配置bean的屬性 -->
+	<bean id="car" class="com.wch.spring.beans.Car">
+		<constructor-arg value="Audi" index="0"/>
+		<constructor-arg value="Taipei" index="1"/>
+		<constructor-arg value="1500000" type="double"/>
+	</bean>
+	
+	<!-- 使用建構子注入屬性質，可以指定參數的位置和類別，以區分overloading的建構子 -->
+	<bean id="car2" class="com.wch.spring.beans.Car">
+		<constructor-arg value="BMW" type="java.lang.String"/>
+		<!-- 如果字串包含特殊字元，可以使用<![CDATA[]]>將字串包起來 -->
+		<!-- 屬性值可以使用value子元素進行設定 -->
+		<constructor-arg type="java.lang.String">
+			<value><![CDATA[<Taipei>]]></value>
+		</constructor-arg>
+		<constructor-arg type="int">
+			<value>240</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="person" class="com.wch.spring.beans.Person">
+		<property name="name" value="Tom"/>
+		<property name="age" value="24"/>
+		
+		<!-- 可以使用property的ref屬性建立bean之間的引用關係 -->
+		<!-- <property name="car" ref="car2"/> -->
+		
+		<!-- 也可以使用ref子元素來建立引用關係 -->
+		<!-- <property name="car">
+			<ref bean="car2"/>
+		</property> -->
+		
+		<!-- 內部bean，不能被外部引用，只能在內部使用，因此不需要id -->
+		<property name="car">
+			<bean id="car3" class="com.wch.spring.beans.Car">
+				<constructor-arg value="Ford"/>
+				<constructor-arg value="Taichung"/>
+				<constructor-arg value="1000000" type="double"/>
+			</bean>
+		</property>
+		<property name="car.maxSpeed" value="260"/>
+	</bean>
+	
+	<bean id="person2" class="com.wch.spring.beans.Person">
+		<constructor-arg value="Jerry"/>
+		<constructor-arg value="25"/>
+		<!-- <constructor-arg ref="car"/> -->
+		
+		<!-- 測試注入null值 -->
+		<!-- <constructor-arg><null/></constructor-arg> -->
+		
+		<constructor-arg ref="car"></constructor-arg>
+		<!-- 為級聯屬性設定值，注意屬性需要先初始化才能為級聯屬性賦值，否則會有異常，和Struts2不同 -->
+		<property name="car.maxSpeed" value="240"/>
+	</bean>
+	
+	<!-- 測試注入集合屬性 -->
+	<bean id="person3" class="com.wch.spring.beans.collection.Person">
+		<property name="name" value="Mike"/>
+		<property name="age" value="27"/>
+		<property name="cars">
+			<!-- 使用list子元素注入List類別的屬性 -->
+			<list>
+				<ref bean="car"/>
+				<ref bean="car2"/>
+				<bean class="com.wch.spring.beans.Car">
+					<constructor-arg value="Ford" />
+					<constructor-arg value="Taichung" />
+					<constructor-arg value="1000000" type="double" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 注入Map屬性值 -->
+	<bean id="newPerson" class="com.wch.spring.beans.collection.NewPerson">
+		<property name="name" value="Rose"/>
+		<property name="age" value="28"/>
+		<property name="cars">
+			<!-- 使用map元素及map的entry子元素來注入Map類別的成員 -->
+			<map>
+				<entry key="AA" value-ref="car"/>
+				<entry key="BB" value-ref="car2"/>
+			</map>
+		</property>
+	</bean>
+	
+	<!-- 注入Properties屬性值 -->
+	<bean id="dataSource" class="com.wch.spring.beans.collection.DataSource">
+		<property name="properties">
+			<!-- 使用props元素和prop子元素來注入Properties屬性值 -->
+			<props>
+				<prop key="user">root</prop>
+				<prop key="password"></prop>
+				<prop key="jdbcUrl">jdbc:mysql:///test</prop>
+				<prop key="driverClass">com.mysql.jdbc.Driver</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- 注入Singleton的集合bean，以供多個bean進行引用，需要勾選util Namespaces -->
+	<util:list id="cars">
+		<ref bean="car"/>
+		<ref bean="car2"/>
+	</util:list>
+	
+	<bean id="person4" class="com.wch.spring.beans.collection.Person">
+		<property name="name" value="Jack"/>
+		<property name="age" value="29"/>
+		<property name="cars" ref="cars"/>
+	</bean>
+	
+	<!-- 通過p Namespaces來注入bean的屬性 -->
+	<bean id="person5" class="com.wch.spring.beans.collection.Person" p:age="30" p:name="Queen" p:cars-ref="cars"/>
+	
+</beans>
