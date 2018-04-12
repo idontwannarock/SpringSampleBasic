@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- 通過靜態工廠方法來配置bean，注意不是配置靜態工廠方法實例，而是配置bean實例 -->
+	<!-- 
+		class屬性：指向靜態工廠方法的完整類別名稱
+		factory-method：指向靜態工廠方法的名稱
+		constructor-arg：如果工廠方法需要傳入參數，則使用constructor-arg來設定參數
+	 -->
+	<bean id="car1" class="com.wch.spring.beans.factory.StaticCarFactory" factory-method="getCar">
+		<constructor-arg value="Audi"/>
+	</bean>
+	
+	<!-- 配置工廠的實例 -->
+	<bean id="carFactory" class="com.wch.spring.beans.factory.InstanceCarFactory"/>
+	
+	<!-- 通過實例工廠方法來設定bean -->
+	<!-- 
+		factory-bean屬性：指向實例工廠方法的bean
+		factory-method：指向靜態工廠方法的名稱
+		constructor-arg：如果工廠方法需要傳入參數，則使用constructor-arg來設定參數
+	 -->
+	<bean id="car2" factory-bean="carFactory" factory-method="getCar">
+		<constructor-arg value="Ford"/>
+	</bean>
+
+</beans>
